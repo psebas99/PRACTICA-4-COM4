@@ -1,0 +1,179 @@
+SEGUNDA PARTE
+
+FIGURA 1
+
+Fs = 44100;
+Fpass = 1000;
+X = 3;
+Fstop = Fpass + 100 * X;
+Apass = 1;
+Astop = 60;
+
+% Normalizando las frecuencias
+Fpass_normalized = Fpass / (Fs / 2);
+Fstop_normalized = Fstop / (Fs / 2);
+
+% Calculando el orden del filtro manualmente usando la regla empírica
+N = ceil((Astop - 8) / (2.285 * (Fstop_normalized - Fpass_normalized)));
+
+% Diseñando el filtro usando la ventana de Kaiser
+taps = fir1(N, Fstop_normalized * 2, kaiser(N+1, 14.6));
+
+% Calculando la respuesta en frecuencia
+[H, w] = freqz(taps, 1, 1024);
+
+% Graficando la respuesta en frecuencia
+figure;
+plot(w/pi*Fs/2, 20*log10(abs(H)));
+title('Respuesta en Frecuencia del Filtro 1 (Pasa Bajas con ventana de Kaiser)');
+xlabel('Frecuencia (Hz)');
+ylabel('Magnitud (dB)');
+grid on;
+
+figura 2
+
+Fs = 44100;
+Fpass = 1000;  % Frecuencia de paso original
+X = 1;
+Fstop = Fpass + 100 * X;  % Frecuencia de detención original
+Apass = 1;
+Astop = 60;
+
+% Cambia las frecuencias de paso y de detención para el filtro 2
+Fpass2 = 2000;  % Nueva frecuencia de paso
+Fstop2 = Fpass2 + 100 * X;  % Nueva frecuencia de detención
+
+% Normaliza las frecuencias
+Fpass_normalized = Fpass / (Fs / 2);
+Fstop_normalized = Fstop / (Fs / 2);
+Fpass2_normalized = Fpass2 / (Fs / 2);
+Fstop2_normalized = Fstop2 / (Fs / 2);
+
+% Calcula el orden del filtro manualmente usando la regla empírica
+N = ceil((Astop - 8) / (2.285 * (Fstop_normalized - Fpass_normalized)));
+
+% Diseña el filtro 1 usando la ventana de Kaiser
+taps = fir1(N, Fstop_normalized * 2, kaiser(N+1, 14.6));
+
+% Calcula el orden del filtro 2 manualmente
+N2 = ceil((Astop - 8) / (2.285 * (Fstop2_normalized - Fpass2_normalized)));
+
+% Diseña el filtro 2 usando la ventana de Kaiser
+taps2 = fir1(N2, Fstop2_normalized * 2, kaiser(N2+1, 14.6));
+
+% Calcula y muestra la respuesta en frecuencia de ambos filtros
+[H1, w1] = freqz(taps, 1, 1024);
+[H2, w2] = freqz(taps2, 1, 1024);
+
+% Grafica la respuesta en frecuencia de ambos filtros
+figure;
+plot(w1/pi*Fs/2, 20*log10(abs(H1)), 'b', 'LineWidth', 2, 'DisplayName', 'Filtro 1');
+hold on;
+plot(w2/pi*Fs/2, 20*log10(abs(H2)), 'r', 'LineWidth', 2, 'DisplayName', 'Filtro 2');
+title('Respuesta en Frecuencia de Filtro 1 y Filtro 2');
+xlabel('Frecuencia (Hz)');
+ylabel('Magnitud (dB)');
+legend;
+grid on;
+
+FIGURA 3 
+
+Fs = 44100;
+Fpass = 1000;  % Frecuencia de paso original
+X = 3;
+Fstop = Fpass + 100 * X;  % Frecuencia de detención original
+Apass = 1;
+Astop = 60;
+
+% Calcula las nuevas frecuencias de paso y de detención para el filtro 3
+Fstop3 = Fpass - 100 * X;  % Frecuencia de detención del filtro pasa altas
+
+% Normaliza las frecuencias
+Fpass_normalized = Fpass / (Fs / 2);
+Fstop_normalized = Fstop / (Fs / 2);
+Fstop3_normalized = Fstop3 / (Fs / 2);
+
+% Calcula el orden del filtro manualmente usando la regla empírica
+N = ceil((Astop - 8) / (2.285 * (Fstop_normalized - Fpass_normalized)));
+
+% Diseña el filtro pasa bajas (filtro 1) usando la ventana de Kaiser
+taps = fir1(N, Fstop_normalized * 2, kaiser(N+1, 14.6));
+
+% Diseña el filtro pasa altas (filtro 3) utilizando el complemento del filtro 1
+taps3 = -taps;
+taps3(floor(N/2) + 1) = taps3(floor(N/2) + 1) + 1;  % Ajusta el coeficiente central
+
+% Calcula y muestra la respuesta en frecuencia del filtro 3
+[H3, w3] = freqz(taps3, 1, 1024);
+
+% Grafica la respuesta en frecuencia del filtro 3
+figure;
+plot(w3/pi*Fs/2, 20*log10(abs(H3)), 'g', 'LineWidth', 2, 'DisplayName', 'Filtro 3 (Pasa Altas)');
+title('Respuesta en Frecuencia de Filtro 3 (Pasa Altas)');
+xlabel('Frecuencia (Hz)');
+ylabel('Magnitud (dB)');
+legend;
+grid on;
+
+
+FIGURA 4
+Fs = 44100;
+X = 3;
+Bandwidth = 1000;  % Ancho de banda del filtro pasa banda en Hz
+Fpass = 2000;  % Frecuencia de paso (elige el valor que desees)
+Fstop = Fpass + 300;  % Frecuencia de detención
+
+% Normaliza las frecuencias
+Fpass_normalized = Fpass / (Fs / 2);
+Fstop_normalized = Fstop / (Fs / 2);
+Bandwidth_normalized = Bandwidth / (Fs / 2);
+
+% Calcula el orden del filtro manualmente usando la regla empírica
+N = ceil(3.1 / Bandwidth_normalized);
+
+% Diseña el filtro pasa banda usando la ventana de Kaiser
+taps = fir1(N, [Fpass_normalized - Bandwidth_normalized/2, Fpass_normalized + Bandwidth_normalized/2], kaiser(N+1, 14.6));
+
+% Calcula y muestra la respuesta en frecuencia del filtro pasa banda
+[H, w] = freqz(taps, 1, 1024);
+
+% Grafica la respuesta en frecuencia del filtro pasa banda
+figure;
+plot(w/pi*Fs/2, 20*log10(abs(H)), 'b', 'LineWidth', 2, 'DisplayName', 'Filtro 4 (Pasa Banda)');
+title('Respuesta en Frecuencia del Filtro 4 (Pasa Banda)');
+xlabel('Frecuencia (Hz)');
+ylabel('Magnitud (dB)');
+legend;
+grid on;
+
+FIGURA 5
+
+Fs = 44100;
+Fpass = 1000;
+X = 3;
+Fstop = Fpass + 100 * X;
+Apass = 1;
+Astop = 80;  % Cambio en la atenuación de la banda de detención
+
+% Normaliza las frecuencias
+Fpass_normalized = Fpass / (Fs / 2);
+Fstop_normalized = Fstop / (Fs / 2);
+
+% Calcula el orden del filtro manualmente usando la regla empírica
+N = ceil((Astop - 8) / (2.285 * (Fstop_normalized - Fpass_normalized)));
+
+% Diseña el filtro usando la ventana de Kaiser
+taps = fir1(N, Fstop_normalized * 2, kaiser(N+1, 14.6));
+
+% Calcula y muestra la respuesta en frecuencia del filtro
+[H, w] = freqz(taps, 1, 1024);
+
+% Grafica la respuesta en frecuencia del filtro
+figure;
+plot(w/pi*Fs/2, 20*log10(abs(H)), 'r', 'LineWidth', 2, 'DisplayName', 'Filtro 5 (Astop = 80 dB)');
+title('Respuesta en Frecuencia del Filtro 5 (Astop = 80 dB)');
+xlabel('Frecuencia (Hz)');
+ylabel('Magnitud (dB)');
+legend;
+grid on;
+
